@@ -8,8 +8,6 @@ use App\Models\UserTicket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-
 
 class UserAuthController extends Controller
 {
@@ -48,7 +46,6 @@ class UserAuthController extends Controller
         return redirect()->route('user.login')->with('success', 'Registration successful!');
     }
 
-
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -66,50 +63,38 @@ class UserAuthController extends Controller
     }
 
     public function searchTicket(Request $request)
-    {
-        $request->validate([
-            'departure' => 'required|string',
-            'destination' => 'required|string',
-            'departure_date' => 'required|date',
-            'return_date' => 'nullable|date|after:departure_date', 
-        ]);
+{
+    $request->validate([
+        'departure' => 'required|string',
+        'destination' => 'required|string',
+        'departure_date' => 'required|date',
+        'return_date' => 'nullable|date|after:departure_date',
+    ]);
 
-        $query = Ticket::query()
-            ->where('departure', $request->departure)
-            ->where('destination', $request->destination)
-            ->where('departure_date', $request->departure_date);
+    $query = Ticket::query()
+        ->where('departure', $request->departure)
+        ->where('destination', $request->destination)
+        ->where('departure_date', $request->departure_date);
 
-
-        if ($request->return_date) {
-            $query->whereNotNull('return_date')
-                ->where('return_date', $request->return_date);
-            
-            if ($request->return_time) {
-                $query->where('return_time', $request->return_time);
-            }
-        } else {
-            $query->where(function ($q) {
-                $q->whereNull('return_date')
-                  ->orWhere('return_date', '');
-            });
-        }        
-        
-        $tickets = $query->orderBy('departure_date')
-                        ->orderBy('departure_time')
-                        ->orderBy('return_date', 'asc')
-                        ->orderBy('return_time', 'asc')
-                        ->get();
-        
-        dd(vars: $tickets);
-        dd([
-            'query' => $query->toSql(),
-            'bindings' => $query->getBindings(),
-            'data' => $query->get(),
-        ]);
-        
-        return view('user.cek_tiket', compact('tickets'));
-
+    if (!empty($request->return_date)) {
+        $query->whereNotNull('return_date')
+              ->where('return_date', $request->return_date);
+    } else {
+        $query->whereNull('return_date');
     }
+
+    $tickets = $query->orderBy('departure_date')
+                     ->orderBy('departure_time')
+                     ->get();
+
+    $return_date = $request->return_date;
+    $searchPerformed = true;
+                     
+    return view('user.cek_tiket', compact('tickets', 'searchPerformed'))
+        ->with('tripType', $return_date ? 'pulang_pergi' : 'sekali_jalan');
+} 
+
+
 
 
 
