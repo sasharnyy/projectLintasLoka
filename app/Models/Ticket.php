@@ -18,4 +18,7 @@ class Ticket extends Model
         'return_time',
         'price',
     ];
+
+    protected $dates = ['departure_date', 'return_date'];
+
 }

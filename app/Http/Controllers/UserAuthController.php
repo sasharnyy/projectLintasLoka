@@ -88,14 +88,24 @@ class UserAuthController extends Controller
                 $query->where('return_time', $request->return_time);
             }
         } else {
-            $query->whereNull('return_date'); 
-        }
+            $query->where(function ($q) {
+                $q->whereNull('return_date')
+                  ->orWhere('return_date', '');
+            });
+        }        
         
         $tickets = $query->orderBy('departure_date')
                         ->orderBy('departure_time')
                         ->orderBy('return_date', 'asc')
                         ->orderBy('return_time', 'asc')
                         ->get();
+        
+        dd(vars: $tickets);
+        dd([
+            'query' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+            'data' => $query->get(),
+        ]);
         
         return view('user.cek_tiket', compact('tickets'));
 
