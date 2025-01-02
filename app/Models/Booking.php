@@ -13,6 +13,11 @@ class Booking extends Model
         'ticket_id',
         'number_of_passengers',
         'passenger_details',
+        'payment_method',
+        'ticket_price',
+        'bank_account',
+        'va_number', 
+        'dana_number',
         'seat_details',
         'status'
     ];
@@ -26,4 +31,10 @@ class Booking extends Model
     {
         return $this->belongsTo(Ticket::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

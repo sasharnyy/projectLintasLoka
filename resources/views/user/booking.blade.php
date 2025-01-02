@@ -23,7 +23,6 @@
         <div id="seatSelection" class="my-4">
             <h4 class="text-center">Pilih Kursi</h4>
             <div class="seat-grid">
-                <!-- Kursi -->
                 <div class="row">
                     <div class="steering">
                         <span>✇</span>
@@ -49,7 +48,6 @@
 
         <div id="passengerDetails" class="mt-4">
             <h4 class="text-center">Data Penumpang</h4>
-            <!-- Dinamically Added Passenger Details Form -->
         </div>
 
         <div class="text-center">
@@ -101,7 +99,7 @@ function updateSeatSelection() {
 }
 
 function generatePassengerInputs(count) {
-    passengerDetailsContainer.innerHTML = ''; // Clear the existing form
+    passengerDetailsContainer.innerHTML = ''; 
 
     for (let i = 1; i <= count; i++) {
         const passengerForm = `

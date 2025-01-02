@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Sale; 
 use App\Models\Review;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -58,9 +59,18 @@ class AdminAuthController extends Controller
 
     public function showOrders()
     {
-        $orders = Order::all(); 
-        return view('admin.orders', compact('orders'));
-        
+        try {
+            $orders = Order::with('user')->paginate(10); 
+            
+            $orders = Booking::with('user', 'ticket') 
+                ->where('status', 'paid')
+                ->paginate(10);
+
+            return view('admin.orders', compact('orders'));
+
+        } catch (\Exception $e) {
+            return redirect()->route('admin.dashboard')->with('error', 'Failed to retrieve orders: ' . $e->getMessage());
+        }
     }
 
     public function showSales(Request $request)

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Ticket;
 use App\Models\Booking;
 use App\Models\Outlet;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -110,40 +111,40 @@ class UserAuthController extends Controller
     }
 
     public function storeBooking(Request $request, $ticketId)
-{
-    $request->validate([
-        'number_of_passengers' => 'required|integer|min:1',
-        'passenger_details' => 'required|array|min:1|max:' . $request->number_of_passengers,
-        'seat_details' => 'required|string',
-    ]);
-    
-    $ticket = Ticket::findOrFail($ticketId);
-    $selectedSeats = json_decode($request->seat_details);
+    {
+        $request->validate([
+            'number_of_passengers' => 'required|integer|min:1',
+            'passenger_details' => 'required|array|min:1|max:' . $request->number_of_passengers,
+            'seat_details' => 'required|string',
+        ]);
+        
+        $ticket = Ticket::findOrFail($ticketId);
+        $selectedSeats = json_decode($request->seat_details);
 
-    $bookedSeats = Booking::where('ticket_id', $ticketId)
-        ->pluck('seat_details')
-        ->toArray();
+        $bookedSeats = Booking::where('ticket_id', $ticketId)
+            ->pluck('seat_details')
+            ->toArray();
 
-    $bookedSeats = array_reduce($bookedSeats, function ($carry, $item) {
-        return array_merge($carry, json_decode($item, true) ?? []);
-    }, []);
+        $bookedSeats = array_reduce($bookedSeats, function ($carry, $item) {
+            return array_merge($carry, json_decode($item, true) ?? []);
+        }, []);
 
-    foreach ($selectedSeats as $seat) {
-        if (in_array($seat, $bookedSeats)) {
-            return back()->withErrors(['seat_details' => "Kursi {$seat} sudah dipesan."]);
+        foreach ($selectedSeats as $seat) {
+            if (in_array($seat, $bookedSeats)) {
+                return back()->withErrors(['seat_details' => "Kursi {$seat} sudah dipesan."]);
+            }
         }
+
+        $booking = Booking::create([
+            'ticket_id' => $ticket->id,
+            'number_of_passengers' => $request->number_of_passengers,
+            'passenger_details' => json_encode($request->passenger_details),
+            'seat_details' => $request->seat_details,
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('booking.payment', ['bookingId' => $booking->id]);
     }
-
-    $booking = Booking::create([
-        'ticket_id' => $ticket->id,
-        'number_of_passengers' => $request->number_of_passengers,
-        'passenger_details' => json_encode($request->passenger_details),
-        'seat_details' => $request->seat_details,
-        'status' => 'pending',
-    ]);
-
-    return redirect()->route('booking.payment', ['bookingId' => $booking->id]);
-}
 
 
     public function showSuccess($bookingId)
@@ -154,7 +155,7 @@ class UserAuthController extends Controller
 
     public function showPaymentPage($bookingId)
     {
-        $booking = Booking::with('ticket')->findOrFail($bookingId);  // Mengambil booking beserta tiket terkait
+        $booking = Booking::with('ticket')->findOrFail($bookingId);  
         return view('user.payment', compact('booking'));
     }
     
@@ -162,11 +163,40 @@ class UserAuthController extends Controller
     public function completeBooking(Request $request, $bookingId)
     {
         $booking = Booking::findOrFail($bookingId);
-        $booking->status = 'completed';
+
+        $booking->payment_method = $request->input('payment_method');
+
+        $ticketPrice = $request->input('ticket_price');
+        $booking->ticket_price = $ticketPrice;  
+
+        $passengerCount = count(json_decode($booking->passenger_details, true));
+        $totalPrice = $ticketPrice * $passengerCount;
+        $booking->total_price = $totalPrice;  
+
+        if ($request->input('payment_method') == 'virtual_account') {
+            $booking->bank_account = $request->input('bank_account');
+            $booking->va_number = $request->input('va_number');  
+        }
+
+        if ($request->input('payment_method') == 'dana') {
+            $booking->dana_number = $request->input('dana_number');
+        }
+
+        $booking->status = 'paid';
         $booking->save();
+
+        $order = new Order();
+        $order->user_id = $booking->user_id;
+        $order->destination_id = $booking->destination_id; 
+        $order->customer_name = $booking->user->name; 
+        $order->customer_email = $booking->user->email; 
+        $order->total_amount = $booking->total_price; 
+        $order->status = 'pending'; 
+        $order->save();
 
         return redirect()->route('booking.success', ['booking' => $booking->id]);
     }
+
 
     public function showOutlets()
     {
