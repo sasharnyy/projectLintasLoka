@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->time('return_time')->nullable()->after('return_date'); // Menambahkan kolom return_time setelah return_date
+            $table->time('return_time')->nullable()->after('return_date'); 
         });
     }
 

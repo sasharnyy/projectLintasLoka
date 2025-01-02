@@ -15,17 +15,27 @@
             <label for="departure" class="form-label">Keberangkatan</label>
             <select name="departure" id="departure" class="form-control" required>
                 <option value="">Pilih Keberangkatan</option>
-                <optgroup label="Jabodetabek">
-                    <option value="Jakarta">Jakarta</option>
-                    <option value="Tangerang">Tangerang</option>
-                    <option value="Bekasi">Bekasi</option>
-                    <option value="Depok">Depok</option>
-                    <option value="Bogor">Bogor</option>
+                <optgroup label="Jakarta">
+                    <option value="Kelapa Gading">Kelapa Gading</option>
+                    <option value="Sudirman">Sudirman</option>
+                </optgroup>
+                <optgroup label="Bogor">
+                    <option value="Cibinong">Cibinong</option>
+                </optgroup>
+                <optgroup label="Depok">
+                    <option value="Margonda">Margonda</option>
+                </optgroup>
+                <optgroup label="Tangerang">
+                    <option value="BSD City">BSD City</option>
+                </optgroup>
+                <optgroup label="Bekasi">
+                    <option value="Bekasi Barat">Bekasi Barat</option>
                 </optgroup>
                 <optgroup label="Bandung">
                     <option value="Buah Batu">Buah Batu</option>
-                    <option value="Dipatiukur">Dipatiukur</option>
-                    <option value="Pasteur">Pasteur</option>
+                    <option value="Cihampelas">Cihampelas</option>
+                    <option value="Dago">Dago</option>
+                    <option value="Setiabudi">Setiabudi</option>
                 </optgroup>
             </select>
         </div>
@@ -33,17 +43,27 @@
             <label for="destination" class="form-label">Tujuan</label>
             <select name="destination" id="destination" class="form-control" required>
                 <option value="">Pilih Tujuan</option>
-                <optgroup label="Jabodetabek">
-                    <option value="Jakarta">Jakarta</option>
-                    <option value="Tangerang">Tangerang</option>
-                    <option value="Bekasi">Bekasi</option>
-                    <option value="Depok">Depok</option>
-                    <option value="Bogor">Bogor</option>
+                <optgroup label="Jakarta">
+                    <option value="Kelapa Gading">Kelapa Gading</option>
+                    <option value="Sudirman">Sudirman</option>
+                </optgroup>
+                <optgroup label="Bogor">
+                    <option value="Cibinong">Cibinong</option>
+                </optgroup>
+                <optgroup label="Depok">
+                    <option value="Margonda">Margonda</option>
+                </optgroup>
+                <optgroup label="Tangerang">
+                    <option value="BSD City">BSD City</option>
+                </optgroup>
+                <optgroup label="Bekasi">
+                    <option value="Bekasi Barat">Bekasi Barat</option>
                 </optgroup>
                 <optgroup label="Bandung">
                     <option value="Buah Batu">Buah Batu</option>
-                    <option value="Dipatiukur">Dipatiukur</option>
-                    <option value="Pasteur">Pasteur</option>
+                    <option value="Cihampelas">Cihampelas</option>
+                    <option value="Dago">Dago</option>
+                    <option value="Setiabudi">Setiabudi</option>
                 </optgroup>
             </select>
         </div>
@@ -86,7 +106,12 @@
                                 <div class="mb-2">
                                     <strong>Harga:</strong> Rp {{ number_format($ticket->price, 0, ',', '.') }}
                                 </div>
-                                <button class="btn btn-primary w-100">Pesan</button>
+                                <form action="{{ route('booking.page', ['ticketId' => $ticket->id]) }}" method="GET">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary w-100 btn-pesan">
+                                        Pesan
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

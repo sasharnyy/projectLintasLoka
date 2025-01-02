@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'User Dashboard') - LintasLoka Travel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
     body, h1, p, ul, li {
         margin: 0;
@@ -225,8 +226,8 @@
             <nav>
                 <ul>
                     <li><a href="{{ route('user.ticket') }}">Cek Tiket</a></li>
-                    <li><a href="#">Outlet Kami</a></li>
-                    <li><a href="#">Layanan Pelanggan</a></li>
+                    <li><a href="{{ route('user.outlet') }}">Outlet Kami</a></li>
+                    <li><a href="{{route('user.cs')}}">Layanan Pelanggan</a></li>
                 </ul>
             </nav>
             <div class="auth-buttons">
@@ -249,5 +250,6 @@
         </section>
     </main>
     @yield('scripts')
+    @yield('styles')
 </body>
 </html>

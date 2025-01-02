@@ -51,12 +51,15 @@ Route::prefix('user')->group(function () {
     Route::post('login', [UserAuthController::class, 'login']);
     Route::get('register', [UserAuthController::class, 'showRegister'])->name('user.register');
     Route::post('register', [UserAuthController::class, 'register']);
-    Route::get('home', [UserAuthController::class, 'home'])->name('user.home');
     Route::get('/cek-tiket', [UserAuthController::class, 'cekTiketForm'])->name('user.ticket');
     Route::post('/cek-tiket/search', [UserAuthController::class, 'searchTicket'])->name('cek.tiket.search');
-    Route::get('/outlet', [UserAuthController::class, 'outlet'])->name('user.outlet');
-    Route::post('/book', [UserAuthController::class, 'book'])->name('ticket.book');
-    Route::get('/contact', [UserAuthController::class, 'contact'])->name('user.contact');
+    Route::get('/user/outlets', [UserAuthController::class, 'showOutlets'])->name('user.outlet');
+    Route::get('/booking/{ticketId}', [UserAuthController::class, 'showBookingPage'])->name('booking.page');
+    Route::post('/booking/{ticketId}/store', [UserAuthController::class, 'storeBooking'])->name('booking.store');
+    Route::get('/booking/success/{booking}', [UserAuthController::class, 'showSuccess'])->name('booking.success');
+    Route::get('/booking/{bookingId}/payment', [UserAuthController::class, 'showPaymentPage'])->name('booking.payment');
+    Route::post('/booking/{bookingId}/complete', [UserAuthController::class, 'completeBooking'])->name('booking.complete');    
+    Route::get('/layanan-pelanggan', [UserAuthController::class, 'showCustomerServiceForm'])->name('user.cs');
     Route::post('logout', [UserAuthController::class, 'logout'])->name('user.logout');
 });
 
@@ -66,8 +69,4 @@ Route::prefix('admin')->group(function () {
     Route::get('register', [AdminAuthController::class, 'showRegister'])->name('admin.register');
     Route::post('register', [AdminAuthController::class, 'register']);
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-});
-
-Route::fallback(function () {
-    return view('global.notfound');
 });
